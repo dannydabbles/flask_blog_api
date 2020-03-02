@@ -59,15 +59,21 @@ def register_blueprints(app):
 
 def register_api(app):
     auth = HTTPBasicAuth()
+
     @auth.verify_password
     def verify_password(username, password):
-        return user.models.User.query.filter_by(username=username).first().check_password(password)
+        verify_user = user.models.User.query.filter_by(username=username).first()
+        if verify_user is None:
+            raise Exception(f"ERROR: Can not verify password for non-existent user {username}")
+        return verify_user.check_password(password)
+
     rest_api = Api(app, prefix="/api/v0", decorators=[csrf_protect.exempt, auth.login_required])
     rest_api.add_resource(resources.api.Users, '/users')
-    rest_api.add_resource(resources.api.User,  '/users/<string:name>')
-    rest_api.add_resource(resources.api.Posts, '/users/<string:name>/posts')
-    rest_api.add_resource(resources.api.Post,  '/users/<string:name>/posts/<int:id>')
+    rest_api.add_resource(resources.api.User,  '/users/<string:username>')
+    rest_api.add_resource(resources.api.Posts, '/users/<string:username>/posts')
+    rest_api.add_resource(resources.api.Post,  '/users/<string:username>/posts/<int:id>')
     return None
+
 
 def register_errorhandlers(app):
     """Register error handlers."""

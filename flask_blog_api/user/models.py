@@ -54,6 +54,16 @@ class User(UserMixin, SurrogatePK, Model):
         else:
             self.password = None
 
+    def as_dict(self):
+        """Return User data as a dictionary."""
+        return {
+            'username': self.username,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'created_at': str(self.created_at),
+        }
+
     def set_password(self, password):
         """Set password."""
         self.password = bcrypt.generate_password_hash(password)
@@ -88,3 +98,15 @@ class Post(Model):
     def __init__(self, title, content, active=True, **kwargs):
         """Create instance."""
         db.Model.__init__(self, title=title, content=content, active=active, **kwargs)
+
+    def as_dict(self):
+        """Return Post data as a dictionary."""
+        return {
+            'id': self.id,
+            'user': f"{self.user.last_name}, {self.user.first_name}",
+            'created_at': str(self.created_at),
+            'modified_at': str(self.created_at),
+            'active': str(self.active),
+            'title': self.title,
+            'content': self.content,
+        }
