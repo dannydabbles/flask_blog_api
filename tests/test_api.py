@@ -5,11 +5,8 @@ import datetime as dt
 import json
 import pytest
 
-from flask_blog_api.extensions import bcrypt
-
 from flask_blog_api.user.models import Role, User, Post
 
-from .factories import UserFactory
 
 @pytest.mark.usefixtures("db")
 class TestAPI:
@@ -63,7 +60,42 @@ class TestAPI:
         assert any([u["email"] == data["email"] for u in users_data])
         assert user.check_password(data['password'])
 
-    def test_user_api(self, testapp):
+        # Create a user for auth
+        username = "quxfoo"
+        email = "qux@foo.com"
+        password = "quxfoopass"
+        user = User.create(username=username, email=email, password=password)
+        user.save()
+        testapp.authorization = ('Basic', (user.username, password))
+
+        # Get our auth user data
+        response = testapp.get(f"/api/v0/users/{username}")
+        assert response.json["username"] == username
+        assert response.json["email"] == email
+        assert user.check_password(password)
+
+        # Update our auth user data
+        email = "qux2@foo.com"
+        response = testapp.put_json(
+            f"/api/v0/users/{username}",
+            {
+                'username': username,
+                'email': email,
+            }
+        )
+        assert response.json["email"] == email
+        response = testapp.get(f"/api/v0/users/{username}")
+        assert response.json["email"] == email
+
+        # Delete our user
+        response = testapp.get(f"/api/v0/users/{username}")
+        assert response.status_code == 200
+        assert response.json['username'] == username
+        response = testapp.delete(f"/api/v0/users/{username}")
+        assert response.status_code == 200
+        assert User.query.filter_by(username=username).first() is None
+
+    def test_posts_api(self, testapp):
         # Create a user for auth
         username = "barqux"
         email = "bar@qux.com"
@@ -72,30 +104,59 @@ class TestAPI:
         user.save()
         testapp.authorization = ('Basic', (user.username, password))
 
-        # Get our auth user data
-        response = testapp.get("/api/v0/users/" + username)
-        assert response.json["username"] == username
-        assert response.json["email"] == email
-        assert user.check_password(password)
+        # Create some posts
+        response = testapp.post_json(
+            f"/api/v0/users/{username}/posts",
+            {
+                'title': 'post title',
+                'content': 'post content',
+                'active': False
+            }
+        )
 
-        # Update our auth user data
-        email = "bar2@qux.com"
-        response = testapp.put("/api/v0/users/" + username, {
-            'username': username,
-            'email': email,
-        })
-        assert response.json["email"] == email
+        # Get our post
+        response = testapp.get(f"/api/v0/users/{username}/posts")
+        assert len(response.json['posts']) == 1
 
-        # Delete our user
-        response = testapp.get("/api/v0/users/"+username)
+        # Create some more posts
+        for i in range(10):
+            response = testapp.post_json(
+                f"/api/v0/users/{username}/posts",
+                {
+                    'title': f"post title{i}",
+                    'content': f"post content{i}",
+                    'active': True
+                }
+            )
+        response = testapp.get(f"/api/v0/users/{username}/posts")
+        assert len(response.json['posts']) == 11
+
+        # Update our posts
+        posts = Post.query.all()
+        for post in posts:
+            response = testapp.get(f"/api/v0/users/{username}/posts/{post.id}")
+            assert response.json['post']['title'].startswith('post title')
+            assert response.json['post']['content'].startswith('post content')
+            response = testapp.put_json(
+                f"/api/v0/users/{username}/posts/{post.id}",
+                {
+                    'title': f"new post title",
+                    'content': f"new post content",
+                    'active': True
+                }
+            )
+            response = testapp.get(f"/api/v0/users/{username}/posts/{post.id}")
+            assert response.json['post']['title'].startswith('new post title')
+            assert response.json['post']['content'].startswith('new post content')
+        response = testapp.get(f"/api/v0/users/{username}/posts")
+        assert len(response.json['posts']) == 11
+
+        # Delete our posts
+        for post in posts:
+            assert Post.query.filter_by(id=post.id).first() is not None
+            response = testapp.delete(f"/api/v0/users/{username}/posts/{post.id}")
+            assert response.status_code == 200
+            assert Post.query.filter_by(id=post.id).first() is None
+        response = testapp.get(f"/api/v0/users/{username}/posts")
         assert response.status_code == 200
-        assert response.json['username'] == username
-        response = testapp.delete("/api/v0/users/"+username)
-        assert response.status_code == 200
-        assert User.query.filter_by(username=username).first() is None
-
-    def test_posts_api(self, testapp):
-        pass
-
-    def test_post_api(self, testapp):
-        pass
+        assert len(response.json['posts']) == 0

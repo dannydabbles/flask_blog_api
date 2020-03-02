@@ -3,7 +3,12 @@
 {% block content %}
     <div class="container">
         <h1>Welcome {{ current_user.username }}</h1>
-        <h3>This is the members-only page.</h3>
+        <h3>Below are your blog posts:</h3>
+        {% for post in current_user.posts %}
+            {% if post.active %}
+                <h5>{{ post.as_dict() }}</h5>
+            {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}
 

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """The api definition."""
-import datetime as dt
 from flask import Blueprint
 from flask_restful import Resource, reqparse
-from flask_blog_api.extensions import bcrypt
 from flask_blog_api.user.models import User as UserModel
 from flask_blog_api.user.models import Post as PostModel
 
@@ -73,10 +71,10 @@ class User(Resource):
 class Posts(Resource):
     def get(self, username):
         posts = PostModel.query.filter_by(
-            user=UserModel.query.filter_by(
+            user_id=UserModel.query.filter_by(
                 username=username
-            ).first()
-        ).first()
+            ).first().id
+        )
         if posts is None:
             return {}
 
@@ -94,16 +92,21 @@ class Posts(Resource):
             user=UserModel.query.filter_by(username=username).first(),
             title=args['title'],
             content=args['content'],
-            active=args['active'],
+            active=bool(args['active']),
         )
         return post.as_dict(), 200
 
 
 class Post(Resource):
     def get(self, username, id):
+        post = PostModel.query.filter_by(
+            user_id=UserModel.query.filter_by(
+                username=username
+            ).first().id,
+            id=id,
+        ).first()
         return {
-            'posts': [str(post) for post in
-                      PostModel.query.filter_by(user_id=UserModel.query.filter_by(username=username).first().id, id=id)]
+            'post': post.as_dict()
         }
 
     def delete(self, username, id):
@@ -116,7 +119,7 @@ class Post(Resource):
         user = UserModel.query.filter_by(username=username).first()
         if user is None:
             raise Exception(f"ERROR: Can not update post #{id} non-existent user {username}")
-        post = PostModel.query.filter_by(user_id=user.id, id=id)
+        post = PostModel.query.filter_by(user_id=user.id, id=id).first()
         if post is None:
             raise Exception(f"ERROR: Can not update post #{id} user {username}")
         parser = reqparse.RequestParser()
@@ -124,8 +127,7 @@ class Post(Resource):
         parser.add_argument('content', type=str)
         parser.add_argument('active', type=bool)
         args = parser.parse_args(strict=True)
-        post = PostModel.update(
-            user=UserModel.query.filter_by(username=username).first(),
+        post = post.update(
             title=args['title'],
             content=args['content'],
             active=args['active'],
