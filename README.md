@@ -4,6 +4,12 @@ Simple blogging app and REST API
 
 ## Docker Quickstart
 
+To test out the application, including DB setup, tests, and a production server, simply run:
+
+```bash
+./run.sh
+```
+
 This app can be run completely using `Docker` and `docker-compose`. **Using Docker is recommended, as it guarantees the application is run using compatible versions of Python and Node**.
 
 There are three main services:
@@ -31,6 +37,7 @@ docker-compose run --rm manage <<COMMAND>>
 Therefore, to initialize a database you would run
 
 ```bash
+touch dev.db # If it doesn't exist
 docker-compose run --rm manage db init
 docker-compose run --rm manage db migrate
 docker-compose run --rm manage db upgrade

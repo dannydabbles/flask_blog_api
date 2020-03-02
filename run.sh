@@ -1,6 +1,7 @@
 #!/bin/bash
 
 touch dev.db
+cp .env.example .env
 docker-compose build
 docker-compose run --rm manage db init
 docker-compose run --rm manage db migrate

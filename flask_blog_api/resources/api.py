@@ -9,6 +9,7 @@ blueprint = Blueprint('resources', __name__)
 
 
 class Users(Resource):
+    """Resource for the users API endpoint"""
     def get(self):
         return {
             'users': [user.as_dict() for user in UserModel.query.all()]
@@ -35,6 +36,7 @@ class Users(Resource):
 
 
 class User(Resource):
+    """Resource for the user API endpoint"""
     def get(self, username):
         user = UserModel.query.filter_by(username=username).first()
         return user.as_dict(), 200
@@ -69,6 +71,7 @@ class User(Resource):
 
 
 class Posts(Resource):
+    """Resource for the posts API endpoint"""
     def get(self, username):
         posts = PostModel.query.filter_by(
             user_id=UserModel.query.filter_by(
@@ -98,6 +101,7 @@ class Posts(Resource):
 
 
 class Post(Resource):
+    """Resource for the post API endpoint"""
     def get(self, username, id):
         post = PostModel.query.filter_by(
             user_id=UserModel.query.filter_by(
