@@ -6,6 +6,7 @@ import sys
 from flask import Flask, render_template
 from flask_blog_api import commands, public, user, resources
 from flask_restful import Api
+from flask_httpauth import HTTPBasicAuth
 from flask_blog_api.extensions import (
     bcrypt,
     cache,
@@ -57,7 +58,11 @@ def register_blueprints(app):
 
 
 def register_api(app):
-    rest_api = Api(app, prefix="/api/v0")
+    auth = HTTPBasicAuth()
+    @auth.verify_password
+    def verify_password(username, password):
+        return user.models.User.query.filter_by(username=username).first().check_password(password)
+    rest_api = Api(app, prefix="/api/v0", decorators=[csrf_protect.exempt, auth.login_required])
     rest_api.add_resource(resources.api.Users, '/users')
     rest_api.add_resource(resources.api.User,  '/users/<string:name>')
     rest_api.add_resource(resources.api.Posts, '/users/<string:name>/posts')

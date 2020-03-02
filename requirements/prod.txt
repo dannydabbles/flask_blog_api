@@ -33,7 +33,10 @@ Flask-Bcrypt==0.7.1
 Flask-Caching>=1.7.2
 
 # REST API Framework
-Flask-RESTful>=0.3.8
+Flask-RESTful==0.3.8
+
+# REST API Auth
+Flask-HTTPAuth==3.3.0
 
 # Debug toolbar
 Flask-DebugToolbar==0.11.0

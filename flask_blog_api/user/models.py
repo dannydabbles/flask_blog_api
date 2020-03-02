@@ -70,3 +70,21 @@ class User(UserMixin, SurrogatePK, Model):
     def __repr__(self):
         """Represent instance as a unique string."""
         return f"<User({self.username!r})>"
+
+
+class Post(Model):
+    """A blog post."""
+
+    __tablename__ = "posts"
+    id = Column(db.Integer(), primary_key=True)
+    user_id = reference_col("users", nullable=True)
+    user = relationship("User", backref="posts")
+    title = Column(db.String(200), nullable=False)
+    content = Column(db.Text(), nullable=False)
+    created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    modified_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    active = Column(db.Boolean(), default=False)
+
+    def __init__(self, title, content, active=True, **kwargs):
+        """Create instance."""
+        db.Model.__init__(self, title=title, content=content, active=active, **kwargs)
