@@ -4,8 +4,8 @@ import logging
 import sys
 
 from flask import Flask, render_template
-
-from flask_blog_api import commands, public, user
+from flask_blog_api import commands, public, user, resources
+from flask_restful import Api
 from flask_blog_api.extensions import (
     bcrypt,
     cache,
@@ -26,6 +26,7 @@ def create_app(config_object="flask_blog_api.settings"):
     app = Flask(__name__.split(".")[0])
     app.config.from_object(config_object)
     register_extensions(app)
+    register_api(app)
     register_blueprints(app)
     register_errorhandlers(app)
     register_shellcontext(app)
@@ -51,8 +52,17 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(public.views.blueprint)
     app.register_blueprint(user.views.blueprint)
+    app.register_blueprint(resources.api.blueprint)
     return None
 
+
+def register_api(app):
+    rest_api = Api(app, prefix="/api/v0")
+    rest_api.add_resource(resources.api.Users, '/users')
+    rest_api.add_resource(resources.api.User,  '/users/<string:name>')
+    rest_api.add_resource(resources.api.Posts, '/users/<string:name>/posts')
+    rest_api.add_resource(resources.api.Post,  '/users/<string:name>/posts/<int:id>')
+    return None
 
 def register_errorhandlers(app):
     """Register error handlers."""
