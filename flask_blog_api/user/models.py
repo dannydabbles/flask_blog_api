@@ -62,6 +62,7 @@ class User(UserMixin, SurrogatePK, Model):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'created_at': str(self.created_at),
+            'is_admin': self.is_admin
         }
 
     def set_password(self, password):

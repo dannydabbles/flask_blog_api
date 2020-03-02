@@ -28,45 +28,46 @@ class Users(Resource):
         user = UserModel.create(
             username=args['username'],
             email=args['email'],
-            password=bcrypt.generate_password_hash(args['password']),
+            password=args['password'],
             first_name=args['first_name'],
             last_name=args['last_name'],
-            is_admin=args['is_admin'],
+            is_admin=bool(args['is_admin']),
         )
         return user.as_dict(), 200
 
 
 class User(Resource):
     def get(self, username):
-        return {
-            'user': username
-        }
+        user = UserModel.query.filter_by(username=username).first()
+        return user.as_dict(), 200
 
     def delete(self, username):
         user = UserModel.query.filter_by(username=username).first()
         user.delete()
-        return '', 204
+        return {}, 200
 
     def put(self, username):
         user = UserModel.query.filter_by(username=username).first()
         if user is None:
             raise Exception(f"ERROR: Can not update non-existent user {username}")
         parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str, default=user.email)
         parser.add_argument('email', type=str, default=user.email)
         parser.add_argument('password', type=str, default=user.password)
         parser.add_argument('first_name', type=str, default=user.first_name)
         parser.add_argument('last_name', type=str, default=user.last_name)
         parser.add_argument('is_admin', type=bool, default=user.is_admin)
         args = parser.parse_args(strict=True)
-        user = UserModel.create(
+
+        user = user.update(
             username=args['username'],
             email=args['email'],
-            password=bcrypt.generate_password_hash(args['password']),
+            password=args['password'],
             first_name=args['first_name'],
             last_name=args['last_name'],
             is_admin=args['is_admin'],
         )
-        return '', 201
+        return user.as_dict(), 201
 
 
 class Posts(Resource):
@@ -109,7 +110,7 @@ class Post(Resource):
         user = UserModel.query.filter_by(username=username).first()
         post = PostModel.query.filter_by(user_id=user.id, id=id).first()
         post.delete()
-        return '', 204
+        return {}, 200
 
     def put(self, username, id):
         user = UserModel.query.filter_by(username=username).first()
