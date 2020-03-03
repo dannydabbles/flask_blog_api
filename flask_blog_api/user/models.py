@@ -93,7 +93,6 @@ class Post(Model):
     title = Column(db.String(200), nullable=False)
     content = Column(db.Text(), nullable=False)
     created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-    modified_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     active = Column(db.Boolean(), default=False)
 
     def __init__(self, title, content, active=True, **kwargs):
