@@ -105,7 +105,6 @@ class Post(Model):
             'id': self.id,
             'user': f"{self.user.last_name}, {self.user.first_name}",
             'created_at': str(self.created_at),
-            'modified_at': str(self.created_at),
             'active': self.active,
             'title': self.title,
             'content': self.content,

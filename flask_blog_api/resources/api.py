@@ -43,7 +43,8 @@ class User(Resource):
 
     def delete(self, username):
         user = UserModel.query.filter_by(username=username).first()
-        user.delete()
+        if user is not None:
+            user.delete()
         return {}, 200
 
     def put(self, username):
@@ -127,9 +128,9 @@ class Post(Resource):
         if post is None:
             raise Exception(f"ERROR: Can not update post #{id} user {username}")
         parser = reqparse.RequestParser()
-        parser.add_argument('title', type=str)
-        parser.add_argument('content', type=str)
-        parser.add_argument('active', type=bool)
+        parser.add_argument('title', type=str, default=post.title)
+        parser.add_argument('content', type=str, default=post.content)
+        parser.add_argument('active', type=bool, default=post.active)
         args = parser.parse_args(strict=True)
         post = post.update(
             title=args['title'],

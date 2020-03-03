@@ -3,7 +3,7 @@
 import logging
 import sys
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, make_response
 from flask_blog_api import commands, public, user, resources
 from flask_restful import Api
 from flask_httpauth import HTTPBasicAuth
@@ -63,9 +63,13 @@ def register_api(app):
     @auth.verify_password
     def verify_password(username, password):
         verify_user = user.models.User.query.filter_by(username=username).first()
-        if verify_user is None:
-            raise Exception(f"ERROR: Can not verify password for non-existent user {username}")
+        if not verify_user:
+            return False
         return verify_user.check_password(password)
+
+    @auth.error_handler
+    def unauthorized():
+        return make_response(jsonify(message='Unauthorized Access: Please make an account at http://0.0.0.0:5000/register/', status=403), 403)
 
     rest_api = Api(app, prefix="/api/v0", decorators=[csrf_protect.exempt, auth.login_required])
     rest_api.add_resource(resources.api.Users, '/users')
