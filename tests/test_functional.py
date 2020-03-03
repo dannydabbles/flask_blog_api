@@ -79,6 +79,8 @@ class TestRegistering:
         form = res.forms["registerForm"]
         form["username"] = "foobar"
         form["email"] = "foo@bar.com"
+        form["first_name"] = "Foo",
+        form["last_name"] = "Bar",
         form["password"] = "secret"
         form["confirm"] = "secret"
         # Submits
@@ -95,6 +97,8 @@ class TestRegistering:
         form = res.forms["registerForm"]
         form["username"] = "foobar"
         form["email"] = "foo@bar.com"
+        form["first_name"] = "Foo",
+        form["last_name"] = "Bar",
         form["password"] = "secret"
         form["confirm"] = "secrets"
         # Submits
@@ -112,6 +116,8 @@ class TestRegistering:
         form = res.forms["registerForm"]
         form["username"] = user.username
         form["email"] = "foo@bar.com"
+        form["first_name"] = "Foo",
+        form["last_name"] = "Bar",
         form["password"] = "secret"
         form["confirm"] = "secret"
         # Submits
