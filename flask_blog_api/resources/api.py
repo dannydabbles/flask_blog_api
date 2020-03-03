@@ -52,7 +52,7 @@ class User(Resource):
         if user is None:
             raise Exception(f"ERROR: Can not update non-existent user {username}")
         parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str, default=user.email)
+        parser.add_argument('username', type=str, default=user.username)
         parser.add_argument('email', type=str, default=user.email)
         parser.add_argument('password', type=str, default=user.password)
         parser.add_argument('first_name', type=str, default=user.first_name)
