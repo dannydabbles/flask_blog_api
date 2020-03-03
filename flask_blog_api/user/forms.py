@@ -16,6 +16,12 @@ class RegisterForm(FlaskForm):
     email = StringField(
         "Email", validators=[DataRequired(), Email(), Length(min=6, max=40)]
     )
+    first_name = StringField(
+        "First name", validators=[DataRequired(), Length(min=1, max=40)]
+    )
+    last_name = StringField(
+        "Last name", validators=[DataRequired(), Length(min=1, max=40)]
+    )
     password = PasswordField(
         "Password", validators=[DataRequired(), Length(min=6, max=40)]
     )

@@ -60,6 +60,8 @@ def register():
         User.create(
             username=form.username.data,
             email=form.email.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
             password=form.password.data,
             active=True,
         )

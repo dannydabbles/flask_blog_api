@@ -43,7 +43,7 @@ class User(UserMixin, SurrogatePK, Model):
     created_at = Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     first_name = Column(db.String(30), nullable=True)
     last_name = Column(db.String(30), nullable=True)
-    active = Column(db.Boolean(), default=False)
+    active = Column(db.Boolean(), default=True)
     is_admin = Column(db.Boolean(), default=False)
 
     def __init__(self, username, email, password=None, **kwargs):
@@ -103,7 +103,7 @@ class Post(Model):
         """Return Post data as a dictionary."""
         return {
             'id': self.id,
-            'user': f"{self.user.last_name}, {self.user.first_name}",
+            'user': self.user.full_name,
             'created_at': str(self.created_at),
             'active': self.active,
             'title': self.title,
