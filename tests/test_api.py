@@ -27,7 +27,7 @@ class TestAPI:
         assert user.check_password(password)
 
     def test_users_api(self, testapp):
-        """Test /api/v0/users endpoint"""
+        """Test users endpoints"""
         # Create a user for auth
         username = "barqux"
         email = "bar@qux.com"
@@ -96,6 +96,7 @@ class TestAPI:
         assert User.query.filter_by(username=username).first() is None
 
     def test_posts_api(self, testapp):
+        """Test posts endpoints"""
         # Create a user for auth
         username = "barqux"
         email = "bar@qux.com"

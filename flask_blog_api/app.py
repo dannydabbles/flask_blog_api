@@ -58,6 +58,7 @@ def register_blueprints(app):
 
 
 def register_api(app):
+    """Register REST API endpoints"""
     auth = HTTPBasicAuth()
 
     @auth.verify_password
