@@ -74,14 +74,16 @@ class User(Resource):
 class Posts(Resource):
     """Resource for the posts API endpoint"""
     def get(self, username):
-        posts = PostModel.query.filter_by(
-            user_id=UserModel.query.filter_by(
+        user = UserModel.query.filter_by(
                 username=username
-            ).first().id
-        )
+            ).first()
+        posts = None
+        if user is not None:
+            posts = PostModel.query.filter_by(
+                user_id=user.id
+            )
         if posts is None:
             return {}
-
         return {
             'posts': [post.as_dict() for post in posts]
         }
@@ -104,12 +106,17 @@ class Posts(Resource):
 class Post(Resource):
     """Resource for the post API endpoint"""
     def get(self, username, id):
-        post = PostModel.query.filter_by(
-            user_id=UserModel.query.filter_by(
+        user = UserModel.query.filter_by(
                 username=username
-            ).first().id,
-            id=id,
         ).first()
+        post = None
+        if user is not None:
+            post = PostModel.query.filter_by(
+                user_id=user.id,
+                id=id,
+            ).first()
+        if post is None:
+            return {}
         return {
             'post': post.as_dict()
         }
