@@ -227,7 +227,8 @@ $ curl -XPOST -u testuser:testtest "http://0.0.0.0:5000/api/v0/users/testuser/po
 {"id": 2, "user": "Test User", "created_at": "2020-03-03 20:02:13.800586", "active": false, "title": "mytitle", "content": "mycontent"}
 
 # Get all posts for user <username>
-$ curl -XGET -u testuser:testtest "http://0.0.0.0:5000/api/v0/users/testuser/posts"{"posts": [{"id": 1, "user": "Test User", "created_at": "2020-03-03 20:00:55.216256", "active": true, "title": "mytitle", "content": "mycontent"}, {"id": 2, "user": "Test User", "created_at": "2020-03-03 20:02:13.800586", "active": false, "title": "mytitle", "content": "mycontent"}]}
+$ curl -XGET -u testuser:testtest "http://0.0.0.0:5000/api/v0/users/testuser/posts"
+{"posts": [{"id": 1, "user": "Test User", "created_at": "2020-03-03 20:00:55.216256", "active": true, "title": "mytitle", "content": "mycontent"}, {"id": 2, "user": "Test User", "created_at": "2020-03-03 20:02:13.800586", "active": false, "title": "mytitle", "content": "mycontent"}]}
 
 # Get a particular post for user <username> by ID
 $ curl -XGET -u testuser:testtest "http://0.0.0.0:5000/api/v0/users/testuser/posts/1" 
